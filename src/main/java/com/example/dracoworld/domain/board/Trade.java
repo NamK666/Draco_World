@@ -1,6 +1,7 @@
 package com.example.dracoworld.domain.board;
 
 import com.example.dracoworld.domain.baseentity.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,5 +24,6 @@ public class Trade extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY) // db에 새로운 레코드를 삽입할 때 고유한 id를 자동으로 생성한다.
 	// (주로 @Id와 함께 사용)
 	// GenerationType.IDENTITY : db의 자동 증가 컬럼을 사용
+	@Column
 	private Long id;
 }

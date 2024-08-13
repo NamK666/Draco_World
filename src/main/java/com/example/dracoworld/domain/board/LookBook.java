@@ -1,5 +1,6 @@
 package com.example.dracoworld.domain.board;
 
+import com.example.dracoworld.domain.baseentity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "lookbook")
-public class LookBook {
+public class LookBook extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
