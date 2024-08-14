@@ -2,7 +2,6 @@ package com.example.dracoworld.dto;
 
 import com.example.dracoworld.domain.Member;
 import com.example.dracoworld.domain.baseentity.Updatable;
-import com.example.dracoworld.domain.board.FreeBoard;
 import com.example.dracoworld.domain.board.Trade;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
