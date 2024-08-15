@@ -1,8 +1,8 @@
-package com.example.dracoworld.dto;
+package com.example.dracoworld.dto.board;
 
 import com.example.dracoworld.domain.Member;
 import com.example.dracoworld.domain.baseentity.Updatable;
-import com.example.dracoworld.domain.board.FreeBoard;
+import com.example.dracoworld.domain.board.DailyLook;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FreeBoardDto implements Updatable {
+public class DailyLookDto implements Updatable {
 
 	private Long id;
 	private Long memberId;
@@ -46,31 +46,31 @@ public class FreeBoardDto implements Updatable {
 		return this.content;
 	}
 
-	public static FreeBoardDto convertToDto(FreeBoard freeBoard) {
-		return FreeBoardDto.builder()
-			.id(freeBoard.getId())
-			.memberId(freeBoard.getMember().getMemberId())
-			.authorName(freeBoard.getMember().getNickname())
-			.authorEmail(freeBoard.getMember().getEmail())
-			.title(freeBoard.getTitle())
-			.content(freeBoard.getContent())
-			.postStatus(freeBoard.getStatus())
-			.createdAt(freeBoard.getCreatedAt())
-			.updatedAt(freeBoard.getUpdatedAt())
-			.deletedAt(freeBoard.getDeletedAt())
+	public static DailyLookDto convertToDto(DailyLook dailyLook) {
+		return DailyLookDto.builder()
+			.id(dailyLook.getId())
+			.memberId(dailyLook.getMember().getMemberId())
+			.authorName(dailyLook.getMember().getNickname())
+			.authorEmail(dailyLook.getMember().getEmail())
+			.title(dailyLook.getTitle())
+			.content(dailyLook.getContent())
+			.postStatus(dailyLook.getStatus())
+			.createdAt(dailyLook.getCreatedAt())
+			.updatedAt(dailyLook.getUpdatedAt())
+			.deletedAt(dailyLook.getDeletedAt())
 			.build();
 	}
 
-	public static FreeBoard convertToEntity(FreeBoardDto freeBoardDto, Member member) {
-		return FreeBoard.builder()
-			.id(freeBoardDto.getId())
+	public static DailyLook convertToEntity(DailyLookDto dailyLookDto, Member member) {
+		return DailyLook.builder()
+			.id(dailyLookDto.getId())
 			.member(member)
-			.title(freeBoardDto.getTitle())
-			.content(freeBoardDto.getContent())
-			.status(freeBoardDto.getPostStatus())
-			.createdAt(freeBoardDto.getCreatedAt())
-			.updatedAt(freeBoardDto.getUpdatedAt())
-			.deletedAt(freeBoardDto.getDeletedAt())
+			.title(dailyLookDto.getTitle())
+			.content(dailyLookDto.getContent())
+			.status(dailyLookDto.getPostStatus())
+			.createdAt(dailyLookDto.getCreatedAt())
+			.updatedAt(dailyLookDto.getUpdatedAt())
+			.deletedAt(dailyLookDto.getDeletedAt())
 			.build();
 	}
 }

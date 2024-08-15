@@ -1,8 +1,8 @@
-package com.example.dracoworld.dto;
+package com.example.dracoworld.dto.board;
 
 import com.example.dracoworld.domain.Member;
 import com.example.dracoworld.domain.baseentity.Updatable;
-import com.example.dracoworld.domain.board.Trade;
+import com.example.dracoworld.domain.board.FreeBoard;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TradeDto implements Updatable {
+public class FreeBoardDto implements Updatable {
 
 	private Long id;
 	private Long memberId;
@@ -46,31 +46,31 @@ public class TradeDto implements Updatable {
 		return this.content;
 	}
 
-	public static TradeDto convertToDto(Trade trade) {
-		return TradeDto.builder()
-			.id(trade.getId())
-			.memberId(trade.getMember().getMemberId())
-			.authorName(trade.getMember().getNickname())
-			.authorEmail(trade.getMember().getEmail())
-			.title(trade.getTitle())
-			.content(trade.getContent())
-			.postStatus(trade.getStatus())
-			.createdAt(trade.getCreatedAt())
-			.updatedAt(trade.getUpdatedAt())
-			.deletedAt(trade.getDeletedAt())
+	public static FreeBoardDto convertToDto(FreeBoard freeBoard) {
+		return FreeBoardDto.builder()
+			.id(freeBoard.getId())
+			.memberId(freeBoard.getMember().getMemberId())
+			.authorName(freeBoard.getMember().getNickname())
+			.authorEmail(freeBoard.getMember().getEmail())
+			.title(freeBoard.getTitle())
+			.content(freeBoard.getContent())
+			.postStatus(freeBoard.getStatus())
+			.createdAt(freeBoard.getCreatedAt())
+			.updatedAt(freeBoard.getUpdatedAt())
+			.deletedAt(freeBoard.getDeletedAt())
 			.build();
 	}
 
-	public static Trade convertToEntity(TradeDto tradeDto, Member member) {
-		return Trade.builder()
-			.id(tradeDto.getId())
+	public static FreeBoard convertToEntity(FreeBoardDto freeBoardDto, Member member) {
+		return FreeBoard.builder()
+			.id(freeBoardDto.getId())
 			.member(member)
-			.title(tradeDto.getTitle())
-			.content(tradeDto.getContent())
-			.status(tradeDto.getPostStatus())
-			.createdAt(tradeDto.getCreatedAt())
-			.updatedAt(tradeDto.getUpdatedAt())
-			.deletedAt(tradeDto.getDeletedAt())
+			.title(freeBoardDto.getTitle())
+			.content(freeBoardDto.getContent())
+			.status(freeBoardDto.getPostStatus())
+			.createdAt(freeBoardDto.getCreatedAt())
+			.updatedAt(freeBoardDto.getUpdatedAt())
+			.deletedAt(freeBoardDto.getDeletedAt())
 			.build();
 	}
 }

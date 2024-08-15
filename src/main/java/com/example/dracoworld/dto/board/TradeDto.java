@@ -1,8 +1,8 @@
-package com.example.dracoworld.dto;
+package com.example.dracoworld.dto.board;
 
 import com.example.dracoworld.domain.Member;
 import com.example.dracoworld.domain.baseentity.Updatable;
-import com.example.dracoworld.domain.board.DailyLook;
+import com.example.dracoworld.domain.board.Trade;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DailyLookDto implements Updatable {
+public class TradeDto implements Updatable {
 
 	private Long id;
 	private Long memberId;
@@ -46,31 +46,31 @@ public class DailyLookDto implements Updatable {
 		return this.content;
 	}
 
-	public static DailyLookDto convertToDto(DailyLook dailyLook) {
-		return DailyLookDto.builder()
-			.id(dailyLook.getId())
-			.memberId(dailyLook.getMember().getMemberId())
-			.authorName(dailyLook.getMember().getNickname())
-			.authorEmail(dailyLook.getMember().getEmail())
-			.title(dailyLook.getTitle())
-			.content(dailyLook.getContent())
-			.postStatus(dailyLook.getStatus())
-			.createdAt(dailyLook.getCreatedAt())
-			.updatedAt(dailyLook.getUpdatedAt())
-			.deletedAt(dailyLook.getDeletedAt())
+	public static TradeDto convertToDto(Trade trade) {
+		return TradeDto.builder()
+			.id(trade.getId())
+			.memberId(trade.getMember().getMemberId())
+			.authorName(trade.getMember().getNickname())
+			.authorEmail(trade.getMember().getEmail())
+			.title(trade.getTitle())
+			.content(trade.getContent())
+			.postStatus(trade.getStatus())
+			.createdAt(trade.getCreatedAt())
+			.updatedAt(trade.getUpdatedAt())
+			.deletedAt(trade.getDeletedAt())
 			.build();
 	}
 
-	public static DailyLook convertToEntity(DailyLookDto dailyLookDto, Member member) {
-		return DailyLook.builder()
-			.id(dailyLookDto.getId())
+	public static Trade convertToEntity(TradeDto tradeDto, Member member) {
+		return Trade.builder()
+			.id(tradeDto.getId())
 			.member(member)
-			.title(dailyLookDto.getTitle())
-			.content(dailyLookDto.getContent())
-			.status(dailyLookDto.getPostStatus())
-			.createdAt(dailyLookDto.getCreatedAt())
-			.updatedAt(dailyLookDto.getUpdatedAt())
-			.deletedAt(dailyLookDto.getDeletedAt())
+			.title(tradeDto.getTitle())
+			.content(tradeDto.getContent())
+			.status(tradeDto.getPostStatus())
+			.createdAt(tradeDto.getCreatedAt())
+			.updatedAt(tradeDto.getUpdatedAt())
+			.deletedAt(tradeDto.getDeletedAt())
 			.build();
 	}
 }

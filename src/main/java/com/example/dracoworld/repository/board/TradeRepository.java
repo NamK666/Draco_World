@@ -1,4 +1,4 @@
-package com.example.dracoworld.repository;
+package com.example.dracoworld.repository.board;
 
 import com.example.dracoworld.domain.board.Trade;
 import java.util.List;

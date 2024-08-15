@@ -1,4 +1,4 @@
-package com.example.dracoworld.dto;
+package com.example.dracoworld.dto.board;
 
 import com.example.dracoworld.domain.Member;
 import com.example.dracoworld.domain.baseentity.Updatable;

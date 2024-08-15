@@ -2,8 +2,14 @@ package com.example.dracoworld.service;
 
 import com.example.dracoworld.aop.AuthCheck;
 import com.example.dracoworld.aop.AuthorType;
-import com.example.dracoworld.dto.TradeDto;
-import com.example.dracoworld.repository.TradeRepository;
+import com.example.dracoworld.domain.Member;
+import com.example.dracoworld.domain.board.Trade;
+import com.example.dracoworld.domain.comment.TradeComment;
+import com.example.dracoworld.dto.board.TradeDto;
+import com.example.dracoworld.dto.comment.TradeCommentDto;
+import com.example.dracoworld.repository.board.TradeRepository;
+import com.example.dracoworld.repository.comment.TradeCommentRepository;
+import com.example.dracoworld.security.CurrentUserProvider;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -17,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class TradeService implements BoardService {
 
 	private final TradeRepository tradeRepository;
+	private final CurrentUserProvider currentUserProvider;
+	private final TradeCommentRepository tradeCommentRepository;
 
 
 	/* 거래 게시판 글 목록 조회 */
@@ -38,5 +46,45 @@ public class TradeService implements BoardService {
 			.map(TradeDto::convertToDto); // 조회된 Trade 엔티티가 있다면, 이를 TradeDto 객체로 변환한다.
 		// TradeDto 클래스에 정의된 convertToDto 정적 메서드를 호출하는 것
 	}
+
+	/* 거래 게시판 글 작성하기 */
+	@AuthCheck(value = {"NORMAL", "ADMIN"}, Type = "Trade", AUTHOR_TYPE = AuthorType.POST)
+	@Transactional // 여러 db 작업을 하나의 논리적 단위로 묶어준다.
+	public void createTradePost(TradeDto tradeDto) {
+		// Not Null 예외 처리
+		Trade.validateField(tradeDto.getTitle(), "Title");
+		Trade.validateField(tradeDto.getContent(), "Content");
+
+		// 현재 로그인된 사용자를 가져온다.
+		Member currentUser = currentUserProvider.getCurrentUser();
+
+		// 새로운 거래 게시글을 저장한다.
+		tradeRepository.save(TradeDto.convertToEntity(tradeDto, currentUser));
+	}
+
+	/* 거래 게시판 글 수정하기 */
+	@AuthCheck(value = {"NORMAL",
+		"ADMIN"}, checkAuthor = true, Type = "Trade", AUTHOR_TYPE = AuthorType.POST)
+	@Transactional
+	public void updateTrade(Long id, TradeDto tradeDto) {
+		// Not Null 예외 처리
+		Trade.validateField(tradeDto.getTitle(), "Title");
+		Trade.validateField(tradeDto.getContent(), "Content");
+
+		Trade trade = tradeRepository.findById(id)
+			.orElseThrow(() -> new IllegalArgumentException("id: " + id + " not found"));
+		trade.update(tradeDto);
+	}
+
+	/* 거래 게시판 글의 댓글 목록 조회 */
+	@AuthCheck(value = {"NORMAL", "ADMIN"}, Type = "Trade", AUTHOR_TYPE = AuthorType.COMMENT)
+	public Optional<List<TradeCommentDto>> getCommentsByTradeId(Long tradeId) {
+		List<TradeCommentDto> comments = tradeCommentRepository.findAllByTradeIdAndCommentStatusIsTrue(tradeId).stream()
+			.filter(TradeComment :: getCommentStatus)
+			.map(TradeCommentDto :: convertToDto)
+			.collect(Collectors.toList());
+		return comments.isEmpty() ? Optional.empty() : Optional.of(comments);
+	}
+
 
 }

@@ -1,8 +1,7 @@
-package com.example.dracoworld.dto;
+package com.example.dracoworld.dto.board;
 
 import com.example.dracoworld.domain.Member;
 import com.example.dracoworld.domain.baseentity.Updatable;
-import com.example.dracoworld.domain.board.DailyLook;
 import com.example.dracoworld.domain.board.LookBook;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
