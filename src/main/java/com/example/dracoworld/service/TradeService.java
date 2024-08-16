@@ -79,12 +79,69 @@ public class TradeService implements BoardService {
 	/* 거래 게시판 글의 댓글 목록 조회 */
 	@AuthCheck(value = {"NORMAL", "ADMIN"}, Type = "Trade", AUTHOR_TYPE = AuthorType.COMMENT)
 	public Optional<List<TradeCommentDto>> getCommentsByTradeId(Long tradeId) {
-		List<TradeCommentDto> comments = tradeCommentRepository.findAllByTradeIdAndCommentStatusIsTrue(tradeId).stream()
-			.filter(TradeComment :: getCommentStatus)
-			.map(TradeCommentDto :: convertToDto)
+		List<TradeCommentDto> comments = tradeCommentRepository.findAllByTradeIdAndCommentStatusIsTrue(
+				tradeId).stream()
+			.filter(TradeComment::getCommentStatus)
+			.map(TradeCommentDto::convertToDto)
 			.collect(Collectors.toList());
 		return comments.isEmpty() ? Optional.empty() : Optional.of(comments);
 	}
 
+	/* 거래 게시판 글 댓글 작성 */
+	@AuthCheck(value = {"NORMAL", "ADMIN"}, Type = "Trade", AUTHOR_TYPE = AuthorType.COMMENT)
+	@Transactional
+	public void createTradeComment(Long id, TradeCommentDto tradeCommentDto) {
+		Member currentUser = currentUserProvider.getCurrentUser();
 
+		// Not Null 예외 처리
+		TradeComment.validateField(tradeCommentDto.getContent(), "Content");
+		Trade trade = tradeRepository.findById(id)
+			.orElseThrow(() -> new IllegalArgumentException("id: " + id + " not found"));
+
+		// 댓글 저장
+		TradeComment tradeComment = TradeCommentDto.convertToEntity(trade, tradeCommentDto,
+			currentUser);
+		tradeCommentRepository.save(tradeComment);
+	}
+
+	/* 거래 게시판 글 댓글 수정 */
+	@AuthCheck(value = {"NORMAL",
+		"ADMIN"}, checkAuthor = true, Type = "Trade", AUTHOR_TYPE = AuthorType.COMMENT)
+	@Transactional
+	public void updateTradeComment(Long id, TradeCommentDto tradeCommentDto) {
+		// Not Null 예외 처리
+		TradeComment.validateField(tradeCommentDto.getContent(), "Content");
+		TradeComment tradeComment = tradeCommentRepository.findById(id)
+			.orElseThrow(() -> new IllegalArgumentException("id: " + id + " not found"));
+
+		// 댓글 수정 처리
+		tradeComment.updateComment(tradeCommentDto);
+	}
+
+	/* 거래 게시판 글 댓글 삭제 */
+	@AuthCheck(value = {"NORAML",
+		"ADMIN"}, checkAuthor = true, Type = "Trade", AUTHOR_TYPE = AuthorType.COMMENT)
+	@Transactional
+	public void deleteTradeComment(Long id) {
+		// Not Null 예외 처리
+		TradeComment tradeComment = tradeCommentRepository.findById(id)
+			.orElseThrow(() -> new IllegalArgumentException("id: " + id + " not found"));
+
+		// 댓글 삭제 처리
+		tradeComment.deleteComment();
+	}
+
+	/* 주어진 게시글 ID의 작성자가 현재 사용자인지 확인 */
+	@Override
+	public boolean isPostAuthor(Long postId, String memberEmail) {
+		return tradeRepository.findById(postId).map(trade -> trade.isAuthor(memberEmail))
+			.orElse(false);
+	}
+
+	/* 주어진 댓글 ID의 작성자가 현재 사용자인지 확인 */
+	@Override
+	public boolean isCommentAuthor(Long commentId, String memberEmail) {
+		return tradeCommentRepository.findById(commentId).map(trade -> trade.isAuthor(memberEmail))
+			.orElse(false);
+	}
 }
