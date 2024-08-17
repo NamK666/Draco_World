@@ -8,6 +8,7 @@ import com.example.dracoworld.dto.board.NoticeDto;
 import com.example.dracoworld.repository.board.NoticeRepository;
 import com.example.dracoworld.repository.comment.NoticeCommentRepository;
 import com.example.dracoworld.security.CurrentUserProvider;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -46,7 +47,26 @@ public class NoticeService implements BoardService {
 		noticeRepository.save(notice);
 	}
 
+	/* 공지 게시글 조회 */
 	public Optional<NoticeDto> getNoticeDetail(Long id) {
 		return noticeRepository.findById(id).map(NoticeDto::convertToDto);
+	}
+
+	/* 공지 게시글 수정 */
+	@AuthCheck(value = {
+		"ADMIN"}, checkAuthor = true, Type = "Notice", AUTHOR_TYPE = AuthorType.POST)
+	@Transactional
+	public void editNotice(Long id, NoticeDto noticeDto) {
+		Notice.validateField(noticeDto.getTitle(), "Title");
+		Notice.validateField(noticeDto.getContent(), "Content");
+
+		Notice notice = findByIdAndStatusIsTrue(id);
+		notice.update(noticeDto);
+	}
+
+
+	private Notice findByIdAndStatusIsTrue(Long id) {
+		return noticeRepository.findByIdAndStatusIsTrue(id)
+			.orElseThrow(() -> new EntityNotFoundException("공지사항을 찾지 못하였습니다."));
 	}
 }
