@@ -4,11 +4,14 @@ import com.example.dracoworld.aop.AuthCheck;
 import com.example.dracoworld.aop.AuthorType;
 import com.example.dracoworld.domain.Member;
 import com.example.dracoworld.domain.board.Notice;
+import com.example.dracoworld.domain.comment.NoticeComment;
 import com.example.dracoworld.dto.board.NoticeDto;
+import com.example.dracoworld.dto.comment.NoticeCommentDto;
 import com.example.dracoworld.repository.board.NoticeRepository;
 import com.example.dracoworld.repository.comment.NoticeCommentRepository;
 import com.example.dracoworld.security.CurrentUserProvider;
 import jakarta.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -64,9 +67,73 @@ public class NoticeService implements BoardService {
 		notice.update(noticeDto);
 	}
 
+	/* 공지사항 게시글 삭제 */
+	@AuthCheck(value = {
+		"ADMIN"}, checkAuthor = true, Type = "Notice", AUTHOR_TYPE = AuthorType.POST)
+	@Transactional
+	public void deleteNotice(Long id) {
+		Notice notice = findByIdAndStatusIsTrue(id);
+		notice.delete();
+	}
 
+	/* 공지사항 댓글 조회 */
+	public Optional<List<NoticeCommentDto>> getNoticeCommentList(
+		Long id) {  // Optional: 결과가 없을 수 있음을 명시
+		List<NoticeCommentDto> noticeCommentDtoList
+			= noticeCommentRepository.findAllByCommentStatusIsTrueAndNoticeId(id).stream()
+			.map(NoticeCommentDto::convertToDto)
+			.toList(); // map 연산으로 각 댓글 엔티티를 NoticeCommentDto 로 변환 후에, toList()로 결과를 List 형태로 수집
+		return noticeCommentDtoList.isEmpty() ? Optional.empty()
+			: Optional.of(noticeCommentDtoList);
+	}
+
+	/* 공지사항 댓글 작성 */
+	@AuthCheck(value = {"ADMIN", "NORMAL"}, Type = "Notice", AUTHOR_TYPE = AuthorType.COMMENT)
+	@Transactional
+	public void createNoticeComment(Long id, NoticeCommentDto noticeCommentDto) {
+		// 입력 유효성 검사
+		Notice.validateField(noticeCommentDto.getContent(), "Content");
+
+		//현재 로그인한 사용자 정보 가져오기
+		Member currentUser = currentUserProvider.getCurrentUser();
+
+		//댓글 DTO 정보 설정
+		noticeCommentDto.setAuthorEmail(currentUser.getEmail());
+		noticeCommentDto.setCommentStatus(Boolean.TRUE);
+		noticeCommentDto.setCreatedAt(LocalDateTime.now());
+
+		//공지사항 조회 (주어진 id로 활성 상태의 공지사항을 조회)
+		Notice notice = findByIdAndStatusIsTrue(id);
+
+		//댓글 Entity 생성 및 저장
+		NoticeComment noticeComment = NoticeCommentDto.convertToEntity(noticeCommentDto, notice,
+			currentUser); // DTO를 Entity로 변환한다. 이때, 공지사항과 현재 사용자 정보도 함께 전달
+		noticeCommentRepository.save(noticeComment); // 생성된 댓글 Entity를 저장소에 저장
+	}
+
+	/* 공지사항 댓글 수정 */
+	@AuthCheck(value = {"NORMAL",
+		"ADMIN"}, checkAuthor = true, Type = "Notice", AUTHOR_TYPE = AuthorType.COMMENT)
+	@Transactional
+	public void editNoticeComment(Long postId, Long id,
+		NoticeCommentDto noticeCommentDto) {
+		Notice.validateField(noticeCommentDto.getContent(), "Content");
+
+		findByIdAndStatusIsTrue(postId);
+		NoticeComment noticeComment = findByIdAndCommentStatusIsTrue(id);
+		noticeComment.updateComment(noticeCommentDto);
+	}
+
+	/* 공지사항 찾기 메소드 */
 	private Notice findByIdAndStatusIsTrue(Long id) {
 		return noticeRepository.findByIdAndStatusIsTrue(id)
 			.orElseThrow(() -> new EntityNotFoundException("공지사항을 찾지 못하였습니다."));
 	}
+
+	/* 공지사항 댓글 찾기 메소드 */
+	private NoticeComment findByIdAndCommentStatusIsTrue(Long id) {
+		return noticeCommentRepository.findByIdAndCommentStatusIsTrue(id)
+			.orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
+	}
+
 }
