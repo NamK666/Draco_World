@@ -124,6 +124,15 @@ public class NoticeService implements BoardService {
 		noticeComment.updateComment(noticeCommentDto);
 	}
 
+	/* 공지사항 댓글 삭제 */
+	@AuthCheck(value = {"NORMAL",
+		"ADMIN"}, checkAuthor = true, Type = "Notice", AUTHOR_TYPE = AuthorType.COMMENT)
+	@Transactional
+	public void deleteNoticeComment(Long id) {
+		NoticeComment noticeComment = findByIdAndCommentStatusIsTrue(id);
+		noticeComment.deleteComment();
+	}
+
 	/* 공지사항 찾기 메소드 */
 	private Notice findByIdAndStatusIsTrue(Long id) {
 		return noticeRepository.findByIdAndStatusIsTrue(id)
