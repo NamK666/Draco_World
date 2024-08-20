@@ -2,6 +2,7 @@ package com.example.dracoworld.service;
 
 import com.example.dracoworld.aop.AuthCheck;
 import com.example.dracoworld.aop.AuthorType;
+import com.example.dracoworld.domain.Category;
 import com.example.dracoworld.domain.Member;
 import com.example.dracoworld.domain.board.Notice;
 import com.example.dracoworld.domain.comment.NoticeComment;
@@ -132,6 +133,17 @@ public class NoticeService implements BoardService {
 		NoticeComment noticeComment = findByIdAndCommentStatusIsTrue(id);
 		noticeComment.deleteComment();
 	}
+
+	public Optional<List<NoticeDto>> getNoticeListByCategory(Category category) {
+		List<NoticeDto> getNotice = noticeRepository.findTop5ByCategoryAndStatusIsTrueOrderByCreatedAtDesc(
+				category)
+			.stream()
+			.map(NoticeDto::convertToDto)
+			.collect(Collectors.toList());
+
+		return getNotice.isEmpty() ? Optional.empty() : Optional.of(getNotice);
+	}
+
 
 	/* 공지사항 찾기 메소드 */
 	private Notice findByIdAndStatusIsTrue(Long id) {
