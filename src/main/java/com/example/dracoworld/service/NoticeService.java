@@ -134,12 +134,13 @@ public class NoticeService implements BoardService {
 		noticeComment.deleteComment();
 	}
 
+	/* 카테고리 별로 상위 5개 게시글*/
 	public Optional<List<NoticeDto>> getNoticeListByCategory(Category category) {
 		List<NoticeDto> getNotice = noticeRepository.findTop5ByCategoryAndStatusIsTrueOrderByCreatedAtDesc(
-				category)
-			.stream()
-			.map(NoticeDto::convertToDto)
-			.collect(Collectors.toList());
+				category) // 카테고리와 상태가 true인 공지를 최신순으로 5개 가져오기
+			.stream() // 가져온 목록을 Stream api로 처리
+			.map(NoticeDto::convertToDto) // Notice 엔티티 객체를 DTO로 변환
+			.collect(Collectors.toList()); // 변환된 DTO 객체들을 List로 수집
 
 		return getNotice.isEmpty() ? Optional.empty() : Optional.of(getNotice);
 	}
@@ -157,4 +158,19 @@ public class NoticeService implements BoardService {
 			.orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
 	}
 
+	// 글 작성자가 현재 로그인한 사용자인지 확인 //
+	@Override
+	public boolean isPostAuthor(Long postId, String memberEmail) {
+		return noticeRepository.findById(postId)
+			.map(notice -> notice.isAuthor(memberEmail))
+			.orElse(false);
+	}
+
+	// 댓글 작성자가 현재 로그인한 사용자인지 확인 //
+	@Override
+	public boolean isCommentAuthor(Long commentId, String memberEmail) {
+		return noticeCommentRepository.findById(commentId)
+			.map(notice -> notice.isAuthor(memberEmail))
+			.orElse(false);
+	}
 }
