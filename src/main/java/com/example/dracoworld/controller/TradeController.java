@@ -7,9 +7,11 @@ import com.example.dracoworld.service.NoticeService;
 import com.example.dracoworld.service.TradeService;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -35,5 +37,11 @@ public class TradeController {
 		model.addAttribute("trades", tradeDto);
 		model.addAttribute("tradeNotice", noticeDto);
 		return "trade/list";
+	}
+
+	// 거래 게시판 글 상세 조회
+	@GetMapping("/{id}")
+	public String detail(@PathVariable("id") Long id, Model model) {
+		Optional<TradeDto> tradeDtoOpt = tradeService.getTradeById(id);
 	}
 }
