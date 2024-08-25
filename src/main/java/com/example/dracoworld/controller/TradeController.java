@@ -51,6 +51,7 @@ public class TradeController {
 		if (tradeDtoOpt.isEmpty()) {
 			throw new IllegalArgumentException("Trade not found");
 		}
+
 		TradeDto tradeDto = tradeDtoOpt.get();
 		List<TradeCommentDto> tradeCommentDto = tradeService.getCommentsByTradeId(id)
 			.orElse(Collections.emptyList());
@@ -60,4 +61,12 @@ public class TradeController {
 		model.addAttribute("tradeComment", new TradeCommentDto());
 		return "trade/detail";
 	}
+
+	// 거래 게시판 글 작성 폼
+	@GetMapping("/new")
+	public String newForm(Model model) {
+		model.addAttribute("trade", new TradeDto());
+		return "trade/new";
+	}
+
 }
