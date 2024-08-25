@@ -1,8 +1,10 @@
 package com.example.dracoworld.controller;
 
+import com.example.dracoworld.aop.exception.BoardExceptionHandler;
 import com.example.dracoworld.domain.Category;
 import com.example.dracoworld.dto.board.NoticeDto;
 import com.example.dracoworld.dto.board.TradeDto;
+import com.example.dracoworld.dto.comment.TradeCommentDto;
 import com.example.dracoworld.service.NoticeService;
 import com.example.dracoworld.service.TradeService;
 import java.util.Collections;
@@ -44,5 +46,18 @@ public class TradeController {
 	@GetMapping("/{id}")
 	public String detail(@PathVariable("id") Long id, Model model) {
 		Optional<TradeDto> tradeDtoOpt = tradeService.getTradeById(id);
+
+		// Trade 정보가 없을 때 예외처리
+		if (tradeDtoOpt.isEmpty()) {
+			throw new IllegalArgumentException("Trade not found");
+		}
+		TradeDto tradeDto = tradeDtoOpt.get();
+		List<TradeCommentDto> tradeCommentDto = tradeService.getCommentsByTradeId(id)
+			.orElse(Collections.emptyList());
+
+		model.addAttribute("trade", tradeDto);
+		model.addAttribute("tradeComments", tradeCommentDto);
+		model.addAttribute("tradeComment", new TradeCommentDto());
+		return "trade/detail";
 	}
 }
