@@ -40,6 +40,7 @@ public class TradeController {
 	}
 
 	// 거래 게시판 글 상세 조회
+	@BoardExceptionHandler(boardType = "trade", errorRedirect = "redirect:/fashionlog/trade")
 	@GetMapping("/{id}")
 	public String detail(@PathVariable("id") Long id, Model model) {
 		Optional<TradeDto> tradeDtoOpt = tradeService.getTradeById(id);
